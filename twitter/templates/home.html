@@ -1,69 +1,113 @@
-{% extends 'base.html' %} {% load static %} {% block content %}
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 
 <div class="container text-center">
   <div class="row">
+    
+    <!-- COLUNA DOS TWEETS -->
     <div class="col-8">
       <h1>Tweets!</h1>
       <br />
+
       {% for tweet in tweets %}
       <div class="alert alert-dark" role="alert">
         <div class="container">
           <div class="row">
+
+            <!-- FOTO DE PERFIL -->
             <div class="col-1">
               {% if tweet.user.profile.profile_image %}
-              <a href="{% url 'profile' tweet.user.id%}">
-                <img
-                  src="{{ tweet.user.profile.profile_image.url }}"
-                  width="50"
-                  height="50"
-                  class="rounded-circle"
-                  alt="{{ profile.user.username }}"
-                />
-              </a>
-
+                <a href="{% url 'profile' tweet.user.id %}">
+                  <img
+                    src="{{ tweet.user.profile.profile_image.url }}"
+                    width="50"
+                    height="50"
+                    class="rounded-circle"
+                    alt="{{ tweet.user.username }}"
+                  />
+                </a>
               {% else %}
-              <a href="{% url 'profile' tweet.user.id%}">
-                <img
-                  src="{% static 'images/default_profile_pic.png' %}"
-                  width="50"
-                  height="50"
-                  class="rounded-circle"
-                  alt="{{ profile.user.username }}"
-                />
-              </a>
+                <a href="{% url 'profile' tweet.user.id %}">
+                  <img
+                    src="{% static 'images/default_profile_pic.png' %}"
+                    width="50"
+                    height="50"
+                    class="rounded-circle"
+                    alt="{{ tweet.user.username }}"
+                  />
+                </a>
               {% endif %}
             </div>
 
-            <div class="col-11">
-              {{ tweet.body }}<br />
+            <!-- CONTEÚDO DO TWEET -->
+            <div class="col-11 text-start">
+              <p class="mb-1">{{ tweet.body }}</p>
+
               <small class="text-muted">
-                ({{ tweet.created_at}}) By @{{ tweet.user.username }} -
-                {{tweet.number_of_likes}} Likes {% if user in tweet.likes.all %}
-                <a href="{% url 'tweet_like' tweet.id %}">
-                  <i class="fa-solid fa-heart" style="color: red"></i>
-                </a>
+                ({{ tweet.created_at }}) • @{{ tweet.user.username }} •
+                {{ tweet.number_of_likes }} Likes
+
+                {% if user in tweet.likes.all %}
+                  <a href="{% url 'tweet_like' tweet.id %}">
+                    <i class="fa-solid fa-heart" style="color: red"></i>
+                  </a>
                 {% else %}
-                <a href="{% url 'tweet_like' tweet.id %}">
-                  <i class="fa fa-heart-o" style="color: red"></i>
-                </a>
+                  <a href="{% url 'tweet_like' tweet.id %}">
+                    <i class="fa fa-heart-o" style="color: red"></i>
+                  </a>
                 {% endif %}
               </small>
+
+              <!-- LISTA DE COMENTÁRIOS -->
+              <div class="mt-3 ms-3">
+                {% for comment in tweet.comments.all %}
+                  <div class="border rounded p-2 mb-2 bg-light">
+                    <strong>@{{ comment.user.username }}</strong><br>
+                    {{ comment.body }}<br>
+                    <small class="text-muted">{{ comment.created_at }}</small>
+                  </div>
+                {% empty %}
+                  <small class="text-muted">Nenhum comentário ainda.</small>
+                {% endfor %}
+              </div>
+
+              <!-- FORMULÁRIO PARA COMENTAR -->
+              {% if user.is_authenticated %}
+              <form method="POST" action="{% url 'comment_tweet' tweet.id %}" class="mt-2 ms-3">
+                {% csrf_token %}
+                <textarea
+                  name="body"
+                  rows="2"
+                  class="form-control"
+                  placeholder="Escreva um comentário..."
+                ></textarea>
+                <button type="submit" class="btn btn-sm btn-primary mt-2">
+                  Comentar
+                </button>
+              </form>
+              {% endif %}
+
             </div>
-            <br /><br />
           </div>
         </div>
       </div>
       {% endfor %}
     </div>
+
+    <!-- COLUNA PARA POSTAR TWEET -->
     <div class="col-4">
       <br /><br /><br />
       {% if form %}
       <form method="POST">
-        {% csrf_token %} {{ form.as_p }}
+        {% csrf_token %}
+        {{ form.as_p }}
         <button type="submit" class="btn btn-secondary">Postar Tweet!</button>
       </form>
       {% endif %}
     </div>
-    {% endblock %}
+
   </div>
 </div>
+
+{% endblock %}
