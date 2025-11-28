@@ -156,7 +156,7 @@ def update_user(request):
             user_form.save()
             profile_form.save()
 
-            messages.success(request, ("Your Profile Has Been Updated!"))
+            messages.success(request, ("Seu Usuário foi atualizado"))
             return redirect('home')
 
         return render(request, "update_user.html", {
@@ -164,7 +164,7 @@ def update_user(request):
             'profile_form': profile_form
         })
 
-    messages.success(request, ("You Must Be Logged In To View That Page..."))
+    messages.success(request, ("Precisa estar logado..."))
     return redirect('home')
 
 
@@ -178,7 +178,7 @@ def tweet_like(request, pk):
 
         return redirect(request.META.get("HTTP_REFERER"))
 
-    messages.success(request, ("You Must Be Logged In To View That Page..."))
+    messages.success(request, ("Precisa estar logado..."))
     return redirect('home')
 
 
@@ -188,13 +188,13 @@ def delete_tweet(request, pk):
 
         if request.user == tweet.user:
             tweet.delete()
-            messages.success(request, ("The tweet Has Been Deleted!"))
+            messages.success(request, ("Deletado!"))
             return redirect(request.META.get("HTTP_REFERER"))
         else:
-            messages.success(request, ("You Don't Own That tweet!!"))
+            messages.success(request, ("Não é seu Tweet!!"))
             return redirect('home')
 
-    messages.success(request, ("Please Log In To Continue..."))
+    messages.success(request, ("Precisa estar logado..."))
     return redirect('home')
 
 
@@ -207,15 +207,15 @@ def edit_tweet(request, pk):
             if request.method == "POST":
                 if form.is_valid():
                     form.save()
-                    messages.success(request, ("Your tweet Has Been Updated!"))
+                    messages.success(request, ("Foi atualizado!"))
                     return redirect('home')
 
             return render(request, "edit_tweet.html", {'form': form, 'tweet': tweet})
 
-        messages.success(request, ("You Don't Own That tweet!!"))
+        messages.success(request, ("Não é seu Tweet!!"))
         return redirect('home')
 
-    messages.success(request, ("Please Log In To Continue..."))
+    messages.success(request, ("Precisa estar logado..."))
     return redirect('home')
 
 def comment_tweet(request, pk):
